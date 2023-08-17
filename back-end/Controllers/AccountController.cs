@@ -1,4 +1,5 @@
-﻿using Amazon.DynamoDBv2.DataModel;
+﻿using System.Text;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.DocumentModel;
 using back_end.DTOs;
 using back_end.Entities;
@@ -22,6 +23,10 @@ namespace back_end.Controllers
             _tokenService = tokenService;
         }
 
+        /**
+         * @description: just for test
+         * @return {*}
+         */
         [Authorize]
         [HttpGet]
         public async Task<IActionResult> GetAllUsers()
@@ -49,13 +54,13 @@ namespace back_end.Controllers
                   (
                     "Password",
                     ScanOperator.Equal,
-                    loginDto.Password
+                    CreateMD5(loginDto.Password)
                   )
               }
             );
             List<User> resultList = await search.GetRemainingAsync();
 
-            if (resultList.Count <=0) return Unauthorized();
+            if (resultList.Count <= 0) return Unauthorized();
             User result = resultList.Last();
 
             return new UserDto
@@ -65,6 +70,11 @@ namespace back_end.Controllers
             };
         }
 
+        /**
+         * @description: register a new user
+         * @return {*}
+         */
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult> Register(LoginDto registerDto)
         {
@@ -75,9 +85,31 @@ namespace back_end.Controllers
             {
                 Id = Guid.NewGuid().ToString(),
                 Username = registerDto.Username,
-                Password = registerDto.Password
+                Password = CreateMD5(registerDto.Password)
             });
             return StatusCode(201);
+        }
+
+        /**
+         * @description: create MD5 string for password encoding
+         * @return {*}
+         */
+        private string CreateMD5(string input)
+        {
+            // Use input string to calculate MD5 hash
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                //Convert the byte array to hexadecimal string
+                StringBuilder sb = new System.Text.StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+                return sb.ToString();
+            }
         }
     }
 }

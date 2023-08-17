@@ -1,4 +1,11 @@
-﻿using System;
+﻿/*
+ * @Author: Jacky Huang
+ * @Date: 2023-08-17 17:11:43
+ * @LastEditors: Jacky Huang
+ * @LastEditTime: 2023-08-17 20:31:37
+ * @Description: The best code is no code at all.
+ */
+using System;
 namespace back_end.DTOs
 {
     public class WeatherDto
