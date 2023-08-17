@@ -1,10 +1,8 @@
 using System.Text;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
-using back_end.Data;
 using back_end.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 
@@ -95,6 +93,7 @@ internal class Program
         });
         builder.Services.AddAuthorization();
         builder.Services.AddScoped<TokenService>();
+        builder.Services.AddScoped<WeatherService>();
 
 
 
