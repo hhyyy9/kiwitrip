@@ -14,7 +14,7 @@ namespace back_end.Services
 
 		//example city Auckland
         //https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/Auckland?unitGroup=metric&key=TWMFF6ZF67CJHQXZXBZLZR2XJ&contentType=json
-        public async Task<WeatherDto?> GetWeatherByCity(string cityName)
+        public async Task<WeatherDto> GetWeatherByCity(string cityName)
 		{
             var client = new HttpClient();
 
