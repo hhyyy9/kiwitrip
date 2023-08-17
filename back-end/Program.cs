@@ -1,6 +1,7 @@
 using System.Text;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
+using back_end.Middleware;
 using back_end.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -56,14 +57,13 @@ internal class Program
         var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
         builder.Services.AddCors(options =>
         {
-            options.AddPolicy(MyAllowSpecificOrigins,
-                                  policy =>
-                                  {
-                                      policy.WithOrigins("http://localhost:3000")
-                                                          .AllowAnyHeader()
-                                                          .AllowCredentials()
-                                                          .AllowAnyMethod();
-                                  });
+            options.AddPolicy(MyAllowSpecificOrigins,policy =>
+                {
+                    policy.WithOrigins("http://localhost:3000")
+                          .AllowAnyHeader()
+                          .AllowCredentials()
+                          .AllowAnyMethod();
+                });
         });
 
         // Adds Amazon dynamodb
@@ -99,6 +99,8 @@ internal class Program
 
 
         var app = builder.Build();
+
+        app.UseMiddleware<ExceptionMiddleware>();
 
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
