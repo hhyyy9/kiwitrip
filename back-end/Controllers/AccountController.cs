@@ -7,7 +7,6 @@ using back_end.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-
 namespace back_end.Controllers
 {
     [Route("[controller]")]
@@ -74,13 +73,31 @@ namespace back_end.Controllers
          * @description: register a new user
          * @return {*}
          */
+        //examples: https://docs.aws.amazon.com/zh_cn/amazondynamodb/latest/developerguide/DynamoDBContext.QueryScan.html
         [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult> Register(LoginDto registerDto)
         {
 
-            var user = await _context.LoadAsync<User>(registerDto.Username);
-            if (user != null) return BadRequest($"User with name {registerDto.Username} Already Exists");
+            //var user = await _context.LoadAsync<User>(registerDto.Username);
+            var search = _context.ScanAsync<User>
+            (
+              new[] {
+                new ScanCondition
+                  (
+                    "Username",
+                    ScanOperator.Contains,
+                    registerDto.Username
+                  )
+              }
+            );
+            var users = await search.GetNextSetAsync();
+
+            if (users.Count > 0) return BadRequest(
+                new ProblemDetails {
+                    Title = $"User with name {registerDto.Username} Already Exists"
+                });
+
             await _context.SaveAsync(new User
             {
                 Id = Guid.NewGuid().ToString(),
